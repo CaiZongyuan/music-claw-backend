@@ -2,20 +2,28 @@ import { AppError } from '../errors/app-error'
 import type { ParsedPlaylistResult, PlaylistSummary } from '../types/music'
 import type { QqPlaylistClient, QqPlaylistPage, QqRawTrack } from './types'
 
-const QQ_HOSTS = new Set(['i.y.qq.com', 'y.qq.com'])
+export type QqShareUrlResolver = {
+  resolve: (shareUrl: string) => Promise<string>
+}
 
 type ParseOptions = {
   pageSize?: number
 }
 
 export class QqPlaylistService {
-  constructor(private readonly client: QqPlaylistClient) {}
+  constructor(
+    private readonly client: QqPlaylistClient,
+    private readonly shareUrlResolver: QqShareUrlResolver = {
+      resolve: async (shareUrl) => shareUrl,
+    }
+  ) {}
 
   async parsePlaylist(
     shareUrl: string,
     options: ParseOptions = {}
   ): Promise<ParsedPlaylistResult> {
-    const playlistId = this.extractPlaylistId(shareUrl)
+    const resolvedShareUrl = await this.resolveShareUrl(shareUrl)
+    const playlistId = this.extractPlaylistId(resolvedShareUrl)
     const pageSize = options.pageSize ?? 100
 
     try {
@@ -74,6 +82,25 @@ export class QqPlaylistService {
         'Failed to fetch QQ playlist data',
         502,
         {
+          shareUrl: resolvedShareUrl,
+        }
+      )
+    }
+  }
+
+  private async resolveShareUrl(shareUrl: string) {
+    try {
+      return await this.shareUrlResolver.resolve(shareUrl)
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error
+      }
+
+      throw new AppError(
+        'QQ_SHARE_URL_RESOLVE_FAILED',
+        'Failed to resolve QQ playlist share url',
+        502,
+        {
           shareUrl,
         }
       )
@@ -96,7 +123,7 @@ export class QqPlaylistService {
       )
     }
 
-    if (!QQ_HOSTS.has(url.hostname)) {
+    if (!this.isSupportedQqHost(url.hostname)) {
       throw new AppError(
         'INVALID_QQ_SHARE_URL',
         'Unsupported QQ playlist share url',
@@ -127,6 +154,10 @@ export class QqPlaylistService {
         shareUrl,
       }
     )
+  }
+
+  private isSupportedQqHost(hostname: string) {
+    return hostname === 'y.qq.com' || hostname.endsWith('.y.qq.com')
   }
 
   private normalizePlaylist(playlist: QqPlaylistPage['playlist']): PlaylistSummary {

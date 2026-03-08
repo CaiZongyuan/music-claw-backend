@@ -153,4 +153,40 @@ describe('qq playlist parser', () => {
       message: 'QQ playlist is not publicly accessible',
     })
   })
+
+  it('supports QQ short links after resolving them to playlist pages', async () => {
+    const service = new QqPlaylistService(
+      createClient([
+        {
+          playlist: {
+            id: '12345',
+            title: 'QQ Favorites',
+            trackCount: 1,
+          },
+          tracks: [
+            {
+              id: 'track-1',
+              title: '晴天',
+              artists: ['周杰伦'],
+            },
+          ],
+        },
+      ]),
+      {
+        async resolve() {
+          return 'https://y.qq.com/n/ryqq/playlist/12345'
+        },
+      }
+    )
+
+    const result = await service.parsePlaylist(
+      'https://c6.y.qq.com/base/fcgi-bin/u?__=8HtpQwcTDPrR',
+      {
+        pageSize: 2,
+      }
+    )
+
+    expect(result.playlist.id).toBe('12345')
+    expect(result.tracks).toHaveLength(1)
+  })
 })

@@ -124,14 +124,19 @@ export class ConflictReviewService {
   getImportQueue(sessionId: string): ImportQueue {
     const session = this.requireSession(sessionId)
     const conflictSelections = session.items
-      .filter(
-        (item) => item.decision.type === 'selected_candidate'
-      )
-      .map((item) => ({
-        trackId: item.track.id,
-        selectionType: 'selected_candidate' as const,
-        candidateId: item.decision.candidateId,
-      }))
+      .flatMap((item) => {
+        if (item.decision.type !== 'selected_candidate') {
+          return []
+        }
+
+        return [
+          {
+            trackId: item.track.id,
+            selectionType: 'selected_candidate' as const,
+            candidateId: item.decision.candidateId,
+          },
+        ]
+      })
 
     const uniqueSelections = this.buildUniqueSelections(session.playlistId)
 
