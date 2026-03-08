@@ -7,6 +7,11 @@ export type PlaylistSummary = {
   sourcePlatform: SourcePlatform
 }
 
+export type PlaylistPagination = {
+  pageSize: number
+  pagesFetched: number
+}
+
 export type NormalizedTrack = {
   id: string
   title: string
@@ -32,4 +37,10 @@ export type ImportBatchSummary = {
 export type ImportBatchResult = {
   playlistId: string
   batches: ImportBatchSummary[]
+}
+
+export type ParsedPlaylistResult = {
+  playlist: PlaylistSummary
+  tracks: NormalizedTrack[]
+  pagination: PlaylistPagination
 }
