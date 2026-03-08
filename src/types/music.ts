@@ -76,3 +76,39 @@ export type MatchTracksResult = {
   items: TrackMatchResult[]
   pagination: MatchPagination
 }
+
+export type ReviewDecision =
+  | { type: 'pending' }
+  | { type: 'selected_candidate'; candidateId: number }
+  | { type: 'skipped' }
+  | { type: 'deferred' }
+
+export type ConflictItem = TrackMatchResult & {
+  decision: ReviewDecision
+}
+
+export type ConflictCategory = Exclude<
+  MatchStatus,
+  'unique_match'
+>
+
+export type ConflictPage = {
+  items: ConflictItem[]
+  pagination: {
+    category: ConflictCategory
+    page: number
+    pageSize: number
+    totalItems: number
+    totalPages: number
+  }
+}
+
+export type ImportQueueItem = {
+  trackId: string
+  selectionType: 'unique_match' | 'selected_candidate'
+  candidateId: number
+}
+
+export type ImportQueue = {
+  items: ImportQueueItem[]
+}
