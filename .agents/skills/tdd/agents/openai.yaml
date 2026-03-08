@@ -1,0 +1,4 @@
+interface:
+  display_name: "TDD Loop"
+  short_description: "Run strict red/green/refactor TDD cycles"
+  default_prompt: "Use $tdd to execute a full red/green/refactor cycle for these acceptance criteria."

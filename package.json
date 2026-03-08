@@ -3,6 +3,7 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "NeteaseCloudMusicApi": "^4.29.0",
     "hono": "^4.12.5"
   },
   "devDependencies": {
