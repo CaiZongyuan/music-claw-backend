@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "test": "bun test",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "NeteaseCloudMusicApi": "^4.29.0",
