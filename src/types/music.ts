@@ -44,3 +44,35 @@ export type ParsedPlaylistResult = {
   tracks: NormalizedTrack[]
   pagination: PlaylistPagination
 }
+
+export type MatchStatus =
+  | 'unique_match'
+  | 'unmatched'
+  | 'multiple_candidates'
+  | 'metadata_insufficient'
+
+export type MatchCandidate = {
+  id: number
+  title: string
+  artists: string[]
+  album?: string
+  score: number
+}
+
+export type TrackMatchResult = {
+  track: NormalizedTrack
+  status: MatchStatus
+  candidates: MatchCandidate[]
+}
+
+export type MatchPagination = {
+  page: number
+  pageSize: number
+  totalItems: number
+  totalPages: number
+}
+
+export type MatchTracksResult = {
+  items: TrackMatchResult[]
+  pagination: MatchPagination
+}
